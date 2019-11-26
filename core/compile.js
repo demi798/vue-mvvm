@@ -52,7 +52,7 @@ Compile.prototype = {
         [].slice.call(attrs).forEach(attr => {
             let attrName = attr.name;
             if (self.isDirective(attrName)) {
-                let val = attrName.value;
+                let val = attr.value;
                 let sub = attrName.substring(2);
 
                 // 事件指令
@@ -60,7 +60,7 @@ Compile.prototype = {
                     compileUtils.eventHandler(node, self.$vm, val, sub);
                 } else {
                     // 普通指令
-                    compileUtils[sub] && self.compileUtils[sub](node, self.$vm, val);
+                    compileUtils[sub] && compileUtils[sub](node, self.$vm, val);
                 }
             }
             node.removeAttribute(attrName);
@@ -113,13 +113,14 @@ let compileUtils = {
     },
     eventHandler(node, vm, val, dir) {
         let eventType = dir.split(':')[1];
-        let fn = vm.$option.methods && vm.$option.methods[val];
+        let fn = vm.$options.methods && vm.$options.methods[val];
 
         if (eventType && fn) {
             node.addEventListener(eventType, fn.bind(vm), false);
         }
     },
     _getVMVal(str, data) {
+        console.log('str；', str);
         let arr = str.split('.');
         let val = data;
 
@@ -148,6 +149,7 @@ let updater = {
     },
     htmlUpdater(node, val) {
         node.innerHTML = typeof val === 'undefined' ? '' : val;
+        console.log(node, node.innerHTML);
     },
     modelUpdater(node, val) {
         node.value = typeof val === 'undefined' ? '' : val;
